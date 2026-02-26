@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## unreleased
 
+### Added
+
+- Add `has_topics_enabled` and `allows_users_to_create_topics` fields to `Me` struct
+
 ## 0.13.0 - 2025-07-11
 
 ### Added

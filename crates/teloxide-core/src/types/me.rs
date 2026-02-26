@@ -31,6 +31,15 @@ pub struct Me {
 
     /// `true`, if the bot has a main Web App.
     pub has_main_web_app: bool,
+
+    /// `true`, if the bot has topics enabled.
+    #[serde(default)]
+    pub has_topics_enabled: bool,
+
+    /// `true`, if users are allowed to create topics in groups managed by the
+    /// bot.
+    #[serde(default)]
+    pub allows_users_to_create_topics: bool,
 }
 
 impl Me {
@@ -83,10 +92,52 @@ mod tests {
             supports_inline_queries: false,
             can_connect_to_business: false,
             has_main_web_app: false,
+            has_topics_enabled: false,
+            allows_users_to_create_topics: false,
         };
 
         assert_eq!(me.username(), "SomethingSomethingBot");
         assert_eq!(me.mention(), "@SomethingSomethingBot");
         assert_eq!(me.tme_url(), "https://t.me/SomethingSomethingBot".parse().unwrap());
+    }
+
+    #[test]
+    fn deserialize_new_fields() {
+        let json = r#"{
+            "id":42,
+            "is_bot":true,
+            "first_name":"First",
+            "username":"SomethingSomethingBot",
+            "can_join_groups":false,
+            "can_read_all_group_messages":false,
+            "supports_inline_queries":false,
+            "can_connect_to_business":false,
+            "has_main_web_app":false,
+            "has_topics_enabled":true,
+            "allows_users_to_create_topics":true
+        }"#;
+
+        let me = serde_json::from_str::<Me>(json).unwrap();
+        assert!(me.has_topics_enabled);
+        assert!(me.allows_users_to_create_topics);
+    }
+
+    #[test]
+    fn deserialize_missing_new_fields_defaults_to_false() {
+        let json = r#"{
+            "id":42,
+            "is_bot":true,
+            "first_name":"First",
+            "username":"SomethingSomethingBot",
+            "can_join_groups":false,
+            "can_read_all_group_messages":false,
+            "supports_inline_queries":false,
+            "has_main_web_app":false
+        }"#;
+
+        let me = serde_json::from_str::<Me>(json).unwrap();
+        assert!(!me.can_connect_to_business);
+        assert!(!me.has_topics_enabled);
+        assert!(!me.allows_users_to_create_topics);
     }
 }
